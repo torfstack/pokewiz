@@ -22,4 +22,9 @@ const id2 = '' + Math.floor(Math.random() * 151)
 .row-12 {
   text-align: center;
 }
+
+h1 {
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+}
 </style>

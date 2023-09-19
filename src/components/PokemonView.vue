@@ -2,19 +2,17 @@
 import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
 
-const props = defineProps<{
-  id1: string,
-  id2: string
-}>()
+let id1 = randomPokemon()
+let id2 = randomPokemon()
 
-const btn1Classes = ref('')
-const btn2Classes = ref('')
+let btn1Classes = ref('')
+let btn2Classes = ref('')
 
-async function submitChoice(choice: number) {
+async function submitChoice() {
   const weights: number[] = await Promise.all(
     [
-      weightOfId(props.id1),
-      weightOfId(props.id2)
+      weightOfId(id1),
+      weightOfId(id2)
     ]
   )
 
@@ -26,6 +24,21 @@ async function submitChoice(choice: number) {
     btn1Classes.value = 'wrong'
     btn2Classes.value = 'correct'
   }
+
+  setTimeout(() => {
+    reset()
+  }, 1000)
+}
+
+function randomPokemon(): string {
+  return '' + Math.floor(Math.random() * 151)
+}
+
+function reset() {
+  id1 = randomPokemon()
+  id2 = randomPokemon()
+  btn1Classes.value = ''
+  btn2Classes.value = ''
 }
 
 async function weightOfId(id: string): Promise<number> {
@@ -38,20 +51,29 @@ async function weightOfId(id: string): Promise<number> {
 </script>
 
 <template>
-  <div class="full-width row flex-center">
-    <div class="col-4">
-      <PokeIcon :id="id1"/>
-      <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0 )">
-        This beautiful angel
-      </q-btn>
+  <div class="full-width">
+    <div class="row flex-center">
+      <div class="col-4">
+        <PokeIcon :id="id1"/>
+      </div>
+      <div class="col-4">
+        <PokeIcon :id="id2"/>
+      </div>
     </div>
-    <div class="col-4">
-      <PokeIcon :id="id2"/>
-      <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
-        Or this one?
-      </q-btn>
+    <div class="row flex-center">
+      <div class="col-4">
+        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice()">
+          This beautiful angel
+        </q-btn>
+      </div>
+      <div class="col-4">
+        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice()">
+          Or this angry lettuce?
+        </q-btn>
+      </div>
     </div>
   </div>
+
 </template>
 
 <style scoped>
