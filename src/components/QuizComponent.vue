@@ -1,0 +1,25 @@
+<script lang="ts" setup>
+
+import PokemonView from 'components/PokemonView.vue';
+
+const id1 = '' + Math.floor(Math.random() * 151)
+const id2 = '' + Math.floor(Math.random() * 151)
+
+</script>
+
+<template>
+  <div class="full-width col">
+    <div class="row-12">
+      <h1>Who is heavier?</h1>
+    </div>
+    <div class="row-12">
+      <PokemonView :id1="id1" :id2="id2"/>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.row-12 {
+  text-align: center;
+}
+</style>
