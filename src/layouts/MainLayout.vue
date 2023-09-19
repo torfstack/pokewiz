@@ -30,7 +30,7 @@
           Route 11
         </q-item-label>
 
-        <q-img fit="contain" ratio="1.4" src="Snorlax2.png"/>
+        <q-img fit="contain" ratio="1.4" src="images/snorlax.png"/>
         <div class="text-center">
           <p>A sleeping POKèMON blocks the way!</p>
         </div>
