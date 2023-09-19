@@ -53,20 +53,20 @@ async function weightOfId(id: string): Promise<number> {
 <template>
   <div class="full-width">
     <div class="row flex-center">
-      <div class="col-4">
+      <div class="col-6 col-md-4 col-xl-2">
         <PokeIcon :id="id1"/>
       </div>
-      <div class="col-4">
+      <div class="col-6 col-md-4 col-xl-2">
         <PokeIcon :id="id2"/>
       </div>
     </div>
     <div class="row flex-center">
-      <div class="col-4">
+      <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
         <q-btn id="btn1" :class="btn1Classes" @click="submitChoice()">
           This beautiful angel
         </q-btn>
       </div>
-      <div class="col-4">
+      <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
         <q-btn id="btn2" :class="btn2Classes" @click="submitChoice()">
           Or this angry lettuce?
         </q-btn>

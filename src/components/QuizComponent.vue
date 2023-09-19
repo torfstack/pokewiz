@@ -8,7 +8,7 @@ const id2 = '' + Math.floor(Math.random() * 151)
 </script>
 
 <template>
-  <div class="full-width col">
+  <div class="full-width col q-mt-none">
     <div class="row-12">
       <h1>Who is heavier?</h1>
     </div>
@@ -24,7 +24,6 @@ const id2 = '' + Math.floor(Math.random() * 151)
 }
 
 h1 {
-  font-weight: 500;
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 </style>
