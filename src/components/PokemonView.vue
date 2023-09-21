@@ -2,6 +2,7 @@
 import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
 
+let counter = ref(0)
 let id1 = randomPokemon()
 let id2 = randomPokemon()
 let weight1 = weightOfId(id1)
@@ -10,7 +11,7 @@ let weight2 = weightOfId(id2)
 let btn1Classes = ref('')
 let btn2Classes = ref('')
 
-async function submitChoice() {
+async function submitChoice(idx: number) {
   const weights: number[] = await Promise.all(
     [
       weight1,
@@ -25,6 +26,12 @@ async function submitChoice() {
   } else {
     btn1Classes.value = 'wrong'
     btn2Classes.value = 'correct'
+  }
+
+  if (idx == maxIndex) {
+    counter.value++
+  } else {
+    counter.value = 0
   }
 
   setTimeout(() => {
@@ -56,6 +63,7 @@ async function weightOfId(id: string): Promise<number> {
 
 <template>
   <div class="full-width">
+    <h2>{{ counter }}</h2>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2">
         <PokeIcon :id="id1"/>
@@ -66,12 +74,12 @@ async function weightOfId(id: string): Promise<number> {
     </div>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice()">
+        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0)">
           This beautiful angel
         </q-btn>
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice()">
+        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
           Or this angry lettuce?
         </q-btn>
       </div>
