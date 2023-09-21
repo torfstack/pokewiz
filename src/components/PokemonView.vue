@@ -4,6 +4,8 @@ import PokeIcon from 'components/PokeIcon.vue';
 
 let id1 = randomPokemon()
 let id2 = randomPokemon()
+let weight1 = weightOfId(id1)
+let weight2 = weightOfId(id2)
 
 let btn1Classes = ref('')
 let btn2Classes = ref('')
@@ -11,8 +13,8 @@ let btn2Classes = ref('')
 async function submitChoice() {
   const weights: number[] = await Promise.all(
     [
-      weightOfId(id1),
-      weightOfId(id2)
+      weight1,
+      weight2
     ]
   )
 
@@ -39,6 +41,8 @@ function reset() {
   id2 = randomPokemon()
   btn1Classes.value = ''
   btn2Classes.value = ''
+  weight1 = weightOfId(id1)
+  weight2 = weightOfId(id2)
 }
 
 async function weightOfId(id: string): Promise<number> {
