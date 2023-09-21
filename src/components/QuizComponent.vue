@@ -2,8 +2,8 @@
 
 import PokemonView from 'components/PokemonView.vue';
 
-const id1 = '' + Math.floor(Math.random() * 151)
-const id2 = '' + Math.floor(Math.random() * 151)
+const id1 = '' + (Math.floor(Math.random() * 151) + 1)
+const id2 = '' + (Math.floor(Math.random() * 151) + 1)
 
 </script>
 

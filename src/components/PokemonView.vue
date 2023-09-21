@@ -33,7 +33,7 @@ async function submitChoice() {
 }
 
 function randomPokemon(): string {
-  return '' + Math.floor(Math.random() * 151)
+  return '' + (Math.floor(Math.random() * 151) + 1)
 }
 
 function reset() {
