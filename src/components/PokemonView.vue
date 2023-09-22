@@ -4,7 +4,7 @@ import PokeIcon from 'components/PokeIcon.vue';
 
 let counter = ref(0)
 let id1 = randomPokemon()
-let id2 = randomPokemon()
+let id2 = randomPokemon(id1)
 let weight1 = weightOfId(id1)
 let weight2 = weightOfId(id2)
 
@@ -39,13 +39,14 @@ async function submitChoice(idx: number) {
   }, 1000)
 }
 
-function randomPokemon(): string {
-  return '' + (Math.floor(Math.random() * 151) + 1)
+function randomPokemon(except: string | null = null): string {
+  let rnd = '' + (Math.floor(Math.random() * 151) + 1)
+  return rnd === except ? randomPokemon(except) : rnd
 }
 
 function reset() {
   id1 = randomPokemon()
-  id2 = randomPokemon()
+  id2 = randomPokemon(id2)
   btn1Classes.value = ''
   btn2Classes.value = ''
   weight1 = weightOfId(id1)
