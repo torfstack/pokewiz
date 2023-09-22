@@ -81,7 +81,7 @@ async function weightOfId(id: string): Promise<number> {
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
         <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
-          Or this angry lettuce?
+          This angry lettuce
         </q-btn>
       </div>
     </div>
@@ -97,4 +97,5 @@ async function weightOfId(id: string): Promise<number> {
 .wrong {
   background: #C10015;
 }
+
 </style>
