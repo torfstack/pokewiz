@@ -63,7 +63,7 @@ async function weightOfId(id: string): Promise<number> {
 
 <template>
   <div class="full-width">
-    <h2>{{ counter }}</h2>
+    <h3>{{ counter }}</h3>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2">
         <PokeIcon :id="id1"/>

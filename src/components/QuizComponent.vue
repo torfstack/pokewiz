@@ -10,7 +10,7 @@ const id2 = '' + (Math.floor(Math.random() * 151) + 1)
 <template>
   <div class="full-width col q-mt-none">
     <div class="row-12">
-      <h1>Who is heavier?</h1>
+      <h2>Who is heavier?</h2>
     </div>
     <div class="row-12">
       <PokemonView :id1="id1" :id2="id2"/>
