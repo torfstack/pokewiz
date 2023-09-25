@@ -46,7 +46,7 @@ function randomPokemon(except: string | null = null): string {
 
 function reset() {
   id1 = randomPokemon()
-  id2 = randomPokemon(id2)
+  id2 = randomPokemon(id1)
   btn1Classes.value = ''
   btn2Classes.value = ''
   weight1 = weightOfId(id1)
