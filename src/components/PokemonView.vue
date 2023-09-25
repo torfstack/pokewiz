@@ -8,10 +8,17 @@ let id2 = randomPokemon(id1)
 let weight1 = weightOfId(id1)
 let weight2 = weightOfId(id2)
 
+let submitDisabled = false
+
 let btn1Classes = ref('')
 let btn2Classes = ref('')
 
 async function submitChoice(idx: number) {
+  if (submitDisabled) {
+    return
+  }
+
+  submitDisabled = true
   const weights: number[] = await Promise.all(
     [
       weight1,
@@ -51,6 +58,7 @@ function reset() {
   btn2Classes.value = ''
   weight1 = weightOfId(id1)
   weight2 = weightOfId(id2)
+  submitDisabled = false
 }
 
 async function weightOfId(id: string): Promise<number> {
@@ -75,12 +83,12 @@ async function weightOfId(id: string): Promise<number> {
     </div>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0)">
+        <q-btn id="btn1" :class="btn1Classes" :disabled="btn1Disabled" @click="submitChoice(0)">
           This beautiful angel
         </q-btn>
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
+        <q-btn id="btn2" :class="btn2Classes" :disabled="btn2Disabled" @click="submitChoice(1)">
           This angry lettuce
         </q-btn>
       </div>
