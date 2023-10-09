@@ -1,3 +1,42 @@
+<script lang="ts">
+import {defineComponent, ref} from 'vue';
+import {defineStore} from 'pinia';
+
+function handleWeirdMode() {
+  console.log('awd')
+}
+
+export default defineComponent({
+  name: 'MainLayout',
+
+  components: {},
+
+  setup() {
+    const leftDrawerOpen = ref(false)
+
+    return {
+      leftDrawerOpen,
+      toggleLeftDrawer() {
+        leftDrawerOpen.value = !leftDrawerOpen.value
+      },
+      weirdMode: ref(false)
+    }
+  }
+});
+
+export const weirdModeStore = defineStore('weirdMode', {
+  state: () => ({weirdMode: false}),
+  getters: {
+    isWeird: (state) => state.weirdMode,
+  },
+  actions: {
+    toggle() {
+      this.weirdMode = !this.weirdMode
+    }
+  }
+})
+
+</script>
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
@@ -35,6 +74,9 @@
           <p>A sleeping POKèMON blocks the way!</p>
         </div>
       </q-list>
+      <q-checkbox v-model="weirdMode" @toggle="handleWeirdMode">
+        Weird mode
+      </q-checkbox>
     </q-drawer>
 
     <q-page-container>
@@ -43,26 +85,6 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import {defineComponent, ref} from 'vue';
-
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {},
-
-  setup() {
-    const leftDrawerOpen = ref(false)
-
-    return {
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  }
-});
-</script>
 
 <style scoped>
 .q-img {
