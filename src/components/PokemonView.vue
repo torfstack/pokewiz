@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
+import {cacheExchange, Client, fetchExchange} from '@urql/core'
 
 let counter = ref(0)
 let id1 = randomPokemon()
 let id2 = randomPokemon(id1)
-let weight1 = weightOfId(id1)
-let weight2 = weightOfId(id2)
+let weightsPromise = weightsOfIds([id1, id2])
 
 let submitDisabled = false
 
@@ -19,12 +19,7 @@ async function submitChoice(idx: number) {
   }
 
   submitDisabled = true
-  const weights: number[] = await Promise.all(
-    [
-      weight1,
-      weight2
-    ]
-  )
+  const weights: number[] = await weightsPromise
 
   const maxIndex = weights.indexOf(Math.max(...weights))
   if (0 === maxIndex) {
@@ -56,16 +51,32 @@ function reset() {
   id2 = randomPokemon(id1)
   btn1Classes.value = ''
   btn2Classes.value = ''
-  weight1 = weightOfId(id1)
-  weight2 = weightOfId(id2)
+  weightsPromise = weightsOfIds([id1, id2])
   submitDisabled = false
 }
 
-async function weightOfId(id: string): Promise<number> {
-  const base = 'https://pokeapi.co/api/v2/pokemon/'
-  let resp = await fetch(base + id);
-  let json = await resp.json();
-  return json['weight'] as number;
+async function weightsOfIds(ids: string[]): Promise<number[]> {
+  const graphqlEndpoint = 'https://beta.pokeapi.co/graphql/v1beta'
+  const query = `
+  query weightPokemonQuery($ids: [Int!]) {
+    pokemon_v2_pokemon(where: {id: {_in: $ids}}) {
+      id
+      weight
+    }
+  }
+  `
+  const client = new Client({
+    url: graphqlEndpoint,
+    exchanges: [cacheExchange, fetchExchange]
+  })
+  const result = client.query(query, {ids: ids})
+  return result.toPromise().then(result => {
+    return result.data.pokemon_v2_pokemon.map((singleResult: { weight: number; }) => singleResult.weight)
+  })
+  // const base = 'https://pokeapi.co/api/v2/pokemon/'
+  // let resp = await fetch(base + id);
+  // let json = await resp.json();
+  // return json['weight'] as number;
 }
 
 </script>
