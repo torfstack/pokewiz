@@ -6,7 +6,7 @@ import {cacheExchange, Client, fetchExchange} from '@urql/core'
 let counter = ref(0)
 let id1 = randomPokemon()
 let id2 = randomPokemon(id1)
-let weightsPromise = weightsOfIds([id1, id2])
+let weightsPromise = weightsOfIds(id1, id2)
 
 let submitDisabled = false
 
@@ -20,6 +20,7 @@ async function submitChoice(idx: number) {
 
   submitDisabled = true
   const weights: number[] = await weightsPromise
+  console.log(weights)
 
   const maxIndex = weights.indexOf(Math.max(...weights))
   if (0 === maxIndex) {
@@ -51,15 +52,19 @@ function reset() {
   id2 = randomPokemon(id1)
   btn1Classes.value = ''
   btn2Classes.value = ''
-  weightsPromise = weightsOfIds([id1, id2])
+  weightsPromise = weightsOfIds(id1, id2)
   submitDisabled = false
 }
 
-async function weightsOfIds(ids: string[]): Promise<number[]> {
+async function weightsOfIds(id1: string, id2: string): Promise<number[]> {
   const graphqlEndpoint = 'https://beta.pokeapi.co/graphql/v1beta'
   const query = `
-  query weightPokemonQuery($ids: [Int!]) {
-    pokemon_v2_pokemon(where: {id: {_in: $ids}}) {
+  query weightPokemonQuery($id1: Int!, $id2: Int!) {
+    first: pokemon_v2_pokemon(where: {id: {_eq: $id1}}) {
+      id
+      weight
+    }
+    second: pokemon_v2_pokemon(where: {id: {_eq: $id2}}) {
       id
       weight
     }
@@ -69,14 +74,13 @@ async function weightsOfIds(ids: string[]): Promise<number[]> {
     url: graphqlEndpoint,
     exchanges: [cacheExchange, fetchExchange]
   })
-  const result = client.query(query, {ids: ids})
+  const result = client.query(query, {id1: id1, id2: id2})
   return result.toPromise().then(result => {
-    return result.data.pokemon_v2_pokemon.map((singleResult: { weight: number; }) => singleResult.weight)
+    return [
+      result.data.first.map((singleResult: { weight: number; }) => singleResult.weight)[0],
+      result.data.second.map((singleResult: { weight: number; }) => singleResult.weight)[0]
+    ]
   })
-  // const base = 'https://pokeapi.co/api/v2/pokemon/'
-  // let resp = await fetch(base + id);
-  // let json = await resp.json();
-  // return json['weight'] as number;
 }
 
 </script>
@@ -94,12 +98,12 @@ async function weightsOfIds(ids: string[]): Promise<number[]> {
     </div>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn1" :class="btn1Classes" :disabled="btn1Disabled" @click="submitChoice(0)">
+        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0)">
           This beautiful angel
         </q-btn>
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn2" :class="btn2Classes" :disabled="btn2Disabled" @click="submitChoice(1)">
+        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
           This angry lettuce
         </q-btn>
       </div>
