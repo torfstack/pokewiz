@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 defineProps<{
-  id: string
+  id: number
 }>()
 
-function pokeSprite(id: string): string {
+function pokeSprite(id: number): string {
   const url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
   console.log(`looking up ${url}`)
   return url

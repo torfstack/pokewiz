@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
+import {cacheExchange, Client, fetchExchange} from '@urql/core'
 
 let counter = ref(0)
 let id1 = randomPokemon()
 let id2 = randomPokemon(id1)
-let weight1 = weightOfId(id1)
-let weight2 = weightOfId(id2)
+let weightsPromise = weights()
 
 let submitDisabled = false
 
@@ -19,12 +19,9 @@ async function submitChoice(idx: number) {
   }
 
   submitDisabled = true
-  const weights: number[] = await Promise.all(
-    [
-      weight1,
-      weight2
-    ]
-  )
+  const allWeights: number[] = await weightsPromise
+  const weights = [allWeights[id1 - 1], allWeights[id2 - 1]]
+  console.log('weights are ' + weights)
 
   const maxIndex = weights.indexOf(Math.max(...weights))
   if (0 === maxIndex) {
@@ -46,8 +43,8 @@ async function submitChoice(idx: number) {
   }, 1000)
 }
 
-function randomPokemon(except: string | null = null): string {
-  let rnd = '' + (Math.floor(Math.random() * 151) + 1)
+function randomPokemon(except: number | null = null): number {
+  let rnd = (Math.floor(Math.random() * 151) + 1)
   return rnd === except ? randomPokemon(except) : rnd
 }
 
@@ -56,16 +53,33 @@ function reset() {
   id2 = randomPokemon(id1)
   btn1Classes.value = ''
   btn2Classes.value = ''
-  weight1 = weightOfId(id1)
-  weight2 = weightOfId(id2)
   submitDisabled = false
 }
 
-async function weightOfId(id: string): Promise<number> {
-  const base = 'https://pokeapi.co/api/v2/pokemon/'
-  let resp = await fetch(base + id);
-  let json = await resp.json();
-  return json['weight'] as number;
+async function weights(): Promise<number[]> {
+  const graphqlEndpoint = 'https://beta.pokeapi.co/graphql/v1beta'
+  const query = `
+  query weightPokemonQuery($ids: [Int!]) {
+    pokemon: pokemon_v2_pokemon(where: {id: {_in: $ids}}) {
+      id
+      weight
+    }
+  }
+  `
+  const client = new Client({
+    url: graphqlEndpoint,
+    exchanges: [cacheExchange, fetchExchange]
+  })
+
+  const ids: number[] = new Array(151);
+  for (let i = 1; i <= 151; i++) {
+    ids[i - 1] = i
+  }
+
+  const result = client.query(query, {ids: ids})
+  return result.toPromise().then(result => {
+    return result.data.pokemon.map((pokemon: { weight: number; }) => pokemon.weight)
+  })
 }
 
 </script>
@@ -83,12 +97,12 @@ async function weightOfId(id: string): Promise<number> {
     </div>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn1" :class="btn1Classes" :disabled="btn1Disabled" @click="submitChoice(0)">
+        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0)">
           This beautiful angel
         </q-btn>
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn2" :class="btn2Classes" :disabled="btn2Disabled" @click="submitChoice(1)">
+        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
           This angry lettuce
         </q-btn>
       </div>
