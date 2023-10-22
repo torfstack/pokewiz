@@ -6,7 +6,7 @@ import {cacheExchange, Client, fetchExchange} from '@urql/core'
 let counter = ref(0)
 let id1 = randomPokemon()
 let id2 = randomPokemon(id1)
-let weightsPromise = weightsOfIds(id1, id2)
+let weightsPromise = weights()
 
 let submitDisabled = false
 
@@ -19,8 +19,9 @@ async function submitChoice(idx: number) {
   }
 
   submitDisabled = true
-  const weights: number[] = await weightsPromise
-  console.log(weights)
+  const allWeights: number[] = await weightsPromise
+  const weights = [allWeights[id1 - 1], allWeights[id2 - 1]]
+  console.log('weights are ' + weights)
 
   const maxIndex = weights.indexOf(Math.max(...weights))
   if (0 === maxIndex) {
@@ -42,8 +43,8 @@ async function submitChoice(idx: number) {
   }, 1000)
 }
 
-function randomPokemon(except: string | null = null): string {
-  let rnd = '' + (Math.floor(Math.random() * 151) + 1)
+function randomPokemon(except: number | null = null): number {
+  let rnd = (Math.floor(Math.random() * 151) + 1)
   return rnd === except ? randomPokemon(except) : rnd
 }
 
@@ -52,19 +53,14 @@ function reset() {
   id2 = randomPokemon(id1)
   btn1Classes.value = ''
   btn2Classes.value = ''
-  weightsPromise = weightsOfIds(id1, id2)
   submitDisabled = false
 }
 
-async function weightsOfIds(id1: string, id2: string): Promise<number[]> {
+async function weights(): Promise<number[]> {
   const graphqlEndpoint = 'https://beta.pokeapi.co/graphql/v1beta'
   const query = `
-  query weightPokemonQuery($id1: Int!, $id2: Int!) {
-    first: pokemon_v2_pokemon(where: {id: {_eq: $id1}}) {
-      id
-      weight
-    }
-    second: pokemon_v2_pokemon(where: {id: {_eq: $id2}}) {
+  query weightPokemonQuery($ids: [Int!]) {
+    pokemon: pokemon_v2_pokemon(where: {id: {_in: $ids}}) {
       id
       weight
     }
@@ -74,12 +70,15 @@ async function weightsOfIds(id1: string, id2: string): Promise<number[]> {
     url: graphqlEndpoint,
     exchanges: [cacheExchange, fetchExchange]
   })
-  const result = client.query(query, {id1: id1, id2: id2})
+
+  const ids: number[] = new Array(151);
+  for (let i = 1; i <= 151; i++) {
+    ids[i - 1] = i
+  }
+
+  const result = client.query(query, {ids: ids})
   return result.toPromise().then(result => {
-    return [
-      result.data.first.map((singleResult: { weight: number; }) => singleResult.weight)[0],
-      result.data.second.map((singleResult: { weight: number; }) => singleResult.weight)[0]
-    ]
+    return result.data.pokemon.map((pokemon: { weight: number; }) => pokemon.weight)
   })
 }
 
