@@ -3,15 +3,22 @@ import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
 import {cacheExchange, Client, fetchExchange} from '@urql/core'
 
-let counter = ref(0)
+const name1 = ref('This beautiful angel')
+const name2 = ref('This angry lettuce')
+const btn1Classes = ref('')
+const btn2Classes = ref('')
+const counter = ref(0)
+
 let id1 = randomPokemon()
 let id2 = randomPokemon(id1)
-let weightsPromise = weights()
+let pokemonPromise = pokemon()
+
+pokemonPromise.then(allPokemon => {
+  name1.value = allPokemon[id1 - 1].name
+  name2.value = allPokemon[id2 - 1].name
+})
 
 let submitDisabled = false
-
-let btn1Classes = ref('')
-let btn2Classes = ref('')
 
 async function submitChoice(idx: number) {
   if (submitDisabled) {
@@ -19,7 +26,7 @@ async function submitChoice(idx: number) {
   }
 
   submitDisabled = true
-  const allWeights: number[] = await weightsPromise
+  const allWeights: number[] = (await pokemonPromise).map(p => p.weight)
   const weights = [allWeights[id1 - 1], allWeights[id2 - 1]]
   console.log('weights are ' + weights)
 
@@ -51,17 +58,22 @@ function randomPokemon(except: number | null = null): number {
 function reset() {
   id1 = randomPokemon()
   id2 = randomPokemon(id1)
+  pokemonPromise.then(allPokemon => {
+    name1.value = allPokemon[id1 - 1].name
+    name2.value = allPokemon[id2 - 1].name
+  })
   btn1Classes.value = ''
   btn2Classes.value = ''
   submitDisabled = false
 }
 
-async function weights(): Promise<number[]> {
+async function pokemon(): Promise<Pokemon[]> {
   const graphqlEndpoint = 'https://beta.pokeapi.co/graphql/v1beta'
   const query = `
   query weightPokemonQuery($ids: [Int!]) {
     pokemon: pokemon_v2_pokemon(where: {id: {_in: $ids}}) {
       id
+      name
       weight
     }
   }
@@ -78,8 +90,20 @@ async function weights(): Promise<number[]> {
 
   const result = client.query(query, {ids: ids})
   return result.toPromise().then(result => {
-    return result.data.pokemon.map((pokemon: { weight: number; }) => pokemon.weight)
+    return result.data.pokemon.map((pokemon: { id: number, name: string, weight: number }) => {
+      return {
+        id: pokemon.id,
+        name: pokemon.name,
+        weight: pokemon.weight
+      }
+    })
   })
+}
+
+type Pokemon = {
+  id: number,
+  name: string,
+  weight: number,
 }
 
 </script>
@@ -97,13 +121,13 @@ async function weights(): Promise<number[]> {
     </div>
     <div class="row flex-center">
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn1" :class="btn1Classes" @click="submitChoice(0)">
-          This beautiful angel
+        <q-btn id="btn1" :class="btn1Classes" class="wide" @click="submitChoice(0)">
+          {{ name1 }}
         </q-btn>
       </div>
       <div class="col-6 col-md-4 col-xl-2 q-pa-sm">
-        <q-btn id="btn2" :class="btn2Classes" @click="submitChoice(1)">
-          This angry lettuce
+        <q-btn id="btn2" :class="btn2Classes" class="wide" @click="submitChoice(1)">
+          {{ name2 }}
         </q-btn>
       </div>
     </div>
@@ -118,6 +142,10 @@ async function weights(): Promise<number[]> {
 
 .wrong {
   background: #C10015;
+}
+
+.wide {
+  width: 70%;
 }
 
 </style>
