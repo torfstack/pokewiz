@@ -1,0 +1,11 @@
+name: docker-build
+run-name: ${{ github.actor }} is building a docker image
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  build-it:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./buildit
