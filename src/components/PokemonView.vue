@@ -3,6 +3,7 @@ import {ref} from 'vue';
 import PokeIcon from 'components/PokeIcon.vue';
 import {cacheExchange, Client, fetchExchange} from '@urql/core'
 
+const maxPokemonId = 251
 const name1 = ref('This beautiful angel')
 const name2 = ref('This angry lettuce')
 const btn1Classes = ref('')
@@ -51,7 +52,7 @@ async function submitChoice(idx: number) {
 }
 
 function randomPokemon(except: number | null = null): number {
-  let rnd = (Math.floor(Math.random() * 151) + 1)
+  let rnd = (Math.floor(Math.random() * maxPokemonId) + 1)
   return rnd === except ? randomPokemon(except) : rnd
 }
 
@@ -83,8 +84,8 @@ async function pokemon(): Promise<Pokemon[]> {
     exchanges: [cacheExchange, fetchExchange]
   })
 
-  const ids: number[] = new Array(151);
-  for (let i = 1; i <= 151; i++) {
+  const ids: number[] = new Array(maxPokemonId);
+  for (let i = 1; i <= maxPokemonId; i++) {
     ids[i - 1] = i
   }
 
