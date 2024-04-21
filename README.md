@@ -2,6 +2,6 @@
 
 A Pokemon Quiz
 
-https://pokewiz.torfstack.de/#/
+https://pokewiz.torfstack.com
 
 ![heftychonk_pokemon](ss.png)
